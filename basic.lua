@@ -9,7 +9,7 @@ function setup()
       max_speed_for_map_matching     = 220/3.6, -- speed conversion to m/s
       weight_name                    = 'routability',
       left_hand_driving              = true,
-      u_turn_penalty                 = 60 * 2, -- 2 minutes to change cabin
+      u_turn_penalty                 = 60 * 10, -- 10 minutes to change cabin
       turn_duration                  = 20,
       continue_straight_at_waypoint  = false,
       max_angle                      = 30,
@@ -48,6 +48,7 @@ function process_way(profile, way, result, relations)
         usage = way:get_value_by_key("usage"),
         maxspeed = way:get_value_by_key("maxspeed"),
         gauge = way:get_value_by_key("gauge"),
+        preffered_direction = way:get_value_by_key("railway:preffered_direction")
     }
 
     -- Remove everything that is not railway
@@ -58,7 +59,8 @@ function process_way(profile, way, result, relations)
         data.railway ~= 'rail' and
         data.railway ~= 'turntable' and
         data.railway ~= 'traverser' and
-        data.railway  ~= 'ferry'
+        data.railway  ~= 'ferry' and
+	    data.railway ~= 'construction'
     ) then
         return
     -- Remove military and tourism rails
@@ -116,6 +118,11 @@ function process_way(profile, way, result, relations)
     result.forward_rate = 1
     result.backward_rate = 1
 
+    if data.preffered_direction == "forward" then
+        result.backward_rate = 0.5
+    elseif data.preffered_direction == "backward" then
+        result.forward_rate = 0.5
+    end
 end
 
 function process_turn(profile, turn)
