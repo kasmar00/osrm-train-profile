@@ -8,7 +8,7 @@ function setup()
     properties = {
       max_speed_for_map_matching     = 220/3.6, -- speed conversion to m/s
       weight_name                    = 'routability',
-      left_hand_driving              = true,
+      left_hand_driving              = false,
       u_turn_penalty                 = 60 * 10, -- 10 minutes to change cabin
       turn_duration                  = 20,
       continue_straight_at_waypoint  = false,
@@ -87,6 +87,7 @@ function process_way(profile, way, result, relations)
         data.service == "siding" or
         data.service == "spur" or
         data.service == "yard" or
+        data.service == "crossover" or
         data.usage == "industrial"
     )
 
@@ -117,6 +118,11 @@ function process_way(profile, way, result, relations)
     --
     result.forward_rate = 1
     result.backward_rate = 1
+
+    if is_secondary then
+        result.forward_rate = 0.5
+        result.backward_rate = 0.5
+    end
 
     if data.preffered_direction == "forward" then
         result.backward_rate = 0.5
