@@ -1,4 +1,4 @@
-.PRECIOUS: %.pbf
+.PRECIOUS: world/%.osm.pbf
 
 # List all the source countries we need
 WANTED_COUNTRIES := $(shell grep -v "\#" countries.wanted)
