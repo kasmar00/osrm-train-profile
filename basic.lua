@@ -48,7 +48,7 @@ function process_way(profile, way, result, relations)
         usage = way:get_value_by_key("usage"),
         maxspeed = way:get_value_by_key("maxspeed"),
         gauge = way:get_value_by_key("gauge"),
-        preffered_direction = way:get_value_by_key("railway:preffered_direction")
+        preffered_direction = way:get_value_by_key("railway:preferred_direction")
     }
 
     -- Remove everything that is not railway
