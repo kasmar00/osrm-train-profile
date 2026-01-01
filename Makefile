@@ -19,13 +19,21 @@ output/filtered.osm.pbf: $(subst world,filtered,$(COUNTRIES_PBF))
 	osmium merge $^ -o $@ --overwrite
 
 # Compute the real OSRM data on the combined file
-output/filtered.osrm: output/filtered.osm.pbf basic.lua
+output/filtered.osrm.edges: output/filtered.osm.pbf basic.lua
 	docker run --rm -t -v $(shell pwd):/opt/host ghcr.io/project-osrm/osrm-backend osrm-extract -p /opt/host/basic.lua /opt/host/$<
 
 	docker run --rm -t -v $(shell pwd):/opt/host ghcr.io/project-osrm/osrm-backend osrm-partition /opt/host/$<
 	docker run --rm -t -v $(shell pwd):/opt/host ghcr.io/project-osrm/osrm-backend osrm-customize /opt/host/$<
 
-all: output/filtered.osrm
+all: output/filtered.osrm.edges
 
-serve: output/filtered.osrm basic.lua
-	docker run --rm -t -i -p 5000:5000 -v $(shell pwd):/opt/host ghcr.io/project-osrm/osrm-backend osrm-routed --algorithm mld /opt/host/$<
+serve: output/filtered.osrm.edges basic.lua
+	docker run --rm -t -i -p 5000:5000 -v $(shell pwd):/opt/host ghcr.io/project-osrm/osrm-backend osrm-routed --algorithm mld /opt/host/output/filtered.osrm
+
+clean:
+	rm -f output/filtered.osrm.*
+	rm -f output/filtered.osm.pbf
+	rm -f filtered/*.pbf
+
+dist-clean: clean
+	rm world/*.pbf
